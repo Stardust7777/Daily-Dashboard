@@ -158,6 +158,17 @@ export default function Home() {
     }
   }
 
+  async function skipToday() {
+    const { error } = await supabase
+      .from("skipped_days")
+      .insert({ skip_date: today });
+    if (!error) {
+      alert("Today marked as skipped. No worries — see you next time.");
+    } else {
+      alert("Already marked as skipped today, or something went wrong.");
+    }
+  }
+
   function statusLabel(task) {
     if (task.status === "done") return "✅ Done";
     if (task.status === "pending") return "⏳ Pending";
@@ -170,6 +181,9 @@ export default function Home() {
     <main className="max-w-2xl mx-auto p-6 font-sans">
       <h1 className="text-2xl font-bold mb-1">My Daily Dashboard</h1>
       <p className="text-sm text-gray-500 mb-6">{today}</p>
+      <button onClick={skipToday} className="text-xs text-gray-400 underline mb-6">
+        Skip today
+      </button>
 
       {/* TODAY'S LOCKED-IN LIST */}
       <section className="mb-8">
@@ -279,7 +293,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      
+
       {/* TOMORROW'S LIST */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">📝 Tomorrow's To-Do</h2>

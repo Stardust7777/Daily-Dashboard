@@ -12,5 +12,5 @@ jobs:
       - name: Send Discord reminder
         run: |
           curl -H "Content-Type: application/json" \
-          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://your-app-url-here"}' \
+          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://supabase.com/dashboard/project/gtnsekyikjdlzpfmvvzt"}' \
           ${{ secrets.DISCORD_WEBHOOK_URL }}

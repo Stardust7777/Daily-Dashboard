@@ -12,5 +12,5 @@ jobs:
       - name: Send Discord reminder
         run: |
           curl -H "Content-Type: application/json" \
-          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-355uf0lxq-manish77.vercel.app"}' \
+          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
           ${{ secrets.DISCORD_WEBHOOK_URL }}

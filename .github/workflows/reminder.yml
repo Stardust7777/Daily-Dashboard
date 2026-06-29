@@ -1,0 +1,16 @@
+name: Daily Reminder
+
+on:
+  schedule:
+    - cron: "15 16 * * *"  # 10:00 PM Kathmandu time (UTC+5:45)
+  workflow_dispatch: {}     # lets you manually trigger it to test
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord reminder
+        run: |
+          curl -H "Content-Type: application/json" \
+          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://your-app-url-here"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}

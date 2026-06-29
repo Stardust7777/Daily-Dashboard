@@ -226,30 +226,31 @@ export default function Home() {
         </ul>
       </section>
 
-      {/* DECISION PANEL */}
       {decisionFor && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-80">
-            <p className="mb-4 font-medium">"{decisionFor.text}" — what now?</p>
+          <div className="bg-white text-gray-900 rounded-lg p-6 w-80 shadow-xl">
+            <p className="mb-4 font-medium text-gray-900">
+              "{decisionFor.text}" — what now?
+            </p>
 
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => resolveDecision("tomorrow")}
-                className="border rounded px-3 py-2 text-left hover:bg-gray-100"
+                className="border border-gray-300 text-gray-900 rounded px-3 py-2 text-left hover:bg-gray-100"
               >
                 ➡️ Push to tomorrow
               </button>
 
-              <div className="border rounded px-3 py-2 flex items-center gap-2">
+              <div className="border border-gray-300 rounded px-3 py-2 flex items-center gap-2">
                 <input
                   type="date"
                   value={customDate}
                   onChange={(e) => setCustomDate(e.target.value)}
-                  className="flex-1"
+                  className="flex-1 text-gray-900 bg-white"
                 />
                 <button
                   onClick={() => resolveDecision("reschedule")}
-                  className="text-sm underline"
+                  className="text-sm underline text-gray-900"
                 >
                   Reschedule
                 </button>
@@ -257,13 +258,13 @@ export default function Home() {
 
               <button
                 onClick={() => resolveDecision("discard")}
-                className="border rounded px-3 py-2 text-left hover:bg-gray-100"
+                className="border border-gray-300 text-gray-900 rounded px-3 py-2 text-left hover:bg-gray-100"
               >
                 🗑️ Discard
               </button>
               <button
                 onClick={() => resolveDecision("future_idea")}
-                className="border rounded px-3 py-2 text-left hover:bg-gray-100"
+                className="border border-gray-300 text-gray-900 rounded px-3 py-2 text-left hover:bg-gray-100"
               >
                 💡 Future idea
               </button>
@@ -271,14 +272,14 @@ export default function Home() {
 
             <button
               onClick={() => setDecisionFor(null)}
-              className="mt-4 text-sm text-gray-400 underline"
+              className="mt-4 text-sm text-gray-500 underline"
             >
               Cancel
             </button>
           </div>
         </div>
       )}
-
+      
       {/* TOMORROW'S LIST */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold mb-3">📝 Tomorrow's To-Do</h2>

@@ -2,7 +2,7 @@ name: Daily Reminder
 
 on:
   schedule:
-    - cron: "15 16 * * *"  # 10:00 PM Kathmandu time (UTC+5:45)
+    - cron: "41 15 * * *"   # 15:41 UTC = 9:26 PM Kathmandu
   workflow_dispatch: {}     # lets you manually trigger it to test
 
 jobs:
@@ -12,5 +12,5 @@ jobs:
       - name: Send Discord reminder
         run: |
           curl -H "Content-Type: application/json" \
-          -d '{"content": "🌙 Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
+          -d '{"content": "Hi Manish, Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
           ${{ secrets.DISCORD_WEBHOOK_URL }}

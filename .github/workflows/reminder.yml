@@ -13,4 +13,8 @@ jobs:
         run: |
           curl -H "Content-Type: application/json" \
           -d '{"content": "Hi Manish, Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
+<<<<<<< HEAD
           ${{ secrets.DISCORD_WEBHOOK_URL }}
+=======
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+>>>>>>> d18d3382ec1ed439fcbee295d7ce6d89fcaa3677

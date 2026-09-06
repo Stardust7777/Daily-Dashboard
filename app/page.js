@@ -40,10 +40,10 @@ export default function Home() {
     const { data: today_tasks } = await supabase
       .from("tasks")
       .select("*")
-      .eq("scheduled_date", today)
+      .lte("scheduled_date", today)
       .in("status", ["pending", "done"])
       .eq("is_extra", false)
-      .order("created_at");
+      .order("scheduled_date");
 
     const { data: extraTasks } = await supabase
       .from("tasks")

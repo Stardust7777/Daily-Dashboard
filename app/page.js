@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 function todayStr(offsetDays = 0) {
   const d = new Date();
@@ -26,9 +27,18 @@ export default function Home() {
   const [showFutureIdeas, setShowFutureIdeas] = useState(false);
 
   const today = todayStr();
+  const router = useRouter();
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) router.push("/login");
+    }
+    checkAuth();
   }, []);
 
   async function loadData() {
@@ -181,6 +191,15 @@ export default function Home() {
     <main className="max-w-2xl mx-auto p-6 font-sans">
       <h1 className="text-2xl font-bold mb-1">My Daily Dashboard</h1>
       <p className="text-sm text-gray-500 mb-6">{today}</p>
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          router.push("/login");
+        }}
+        className="text-xs text-gray-400 underline mb-2 block"
+      >
+        Log out
+      </button>
       <button onClick={skipToday} className="text-xs text-gray-400 underline mb-6">
         Skip today
       </button>

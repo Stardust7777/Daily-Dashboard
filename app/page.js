@@ -51,7 +51,7 @@ export default function Home() {
       .from("tasks")
       .select("*")
       .lte("scheduled_date", today)
-      .in("status", ["pending", "done"])
+      .eq("status", "pending")
       .eq("is_extra", false)
       .order("scheduled_date");
 
@@ -225,29 +225,20 @@ export default function Home() {
               </span>
 
               <div className="flex gap-2">
-                {t.status !== "done" ? (
-                  <>
-                    <button
-                      onClick={() => markDone(t)}
-                      className="text-green-600 border border-green-600 rounded px-2 py-0.5 text-sm"
-                    >
-                      ✓ Done
-                    </button>
-                    <button
-                      onClick={() => markNotDone(t)}
-                      className="text-red-600 border border-red-600 rounded px-2 py-0.5 text-sm"
-                    >
-                      ✗ Not done
-                    </button>
-                  </>
-                ) : (
+                <>
                   <button
-                    onClick={() => markPending(t)}
-                    className="text-gray-400 border border-gray-300 rounded px-2 py-0.5 text-sm"
+                    onClick={() => markDone(t)}
+                    className="text-green-600 border border-green-600 rounded px-2 py-0.5 text-sm"
                   >
-                    Undo
+                    ✓ Done
                   </button>
-                )}
+                  <button
+                    onClick={() => markNotDone(t)}
+                    className="text-red-600 border border-red-600 rounded px-2 py-0.5 text-sm"
+                  >
+                    ✗ Not done
+                  </button>
+                </>
               </div>
             </li>
           ))}

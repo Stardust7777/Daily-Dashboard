@@ -1,63 +1,48 @@
-name: Daily Reminders
+name: Daily Reminder
 
 on:
   schedule:
-    - cron: "15 1 * * *"   # 7:00 AM Kathmandu time (UTC+5:45)
-    - cron: "41 15 * * *"  # 15:41 UTC = 9:26 PM Kathmandu 
-  workflow_dispatch: {}     # lets you manually trigger to test
+    - cron: "15 16 * * *"  # 10:00 PM Kathmandu
+    - cron: "15 1 * * *"   # 7:00 AM Kathmandu
+  workflow_dispatch: {}
 
 jobs:
-  morning-reminder:
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 1 * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send morning reminder with today's tasks
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: |
-          python3 - <<'EOF'
-          import requests, os
-          from datetime import datetime, timezone, timedelta
-
-          npt = timezone(timedelta(hours=5, minutes=45))
-          today = datetime.now(npt).strftime('%Y-%m-%d')
-
-          headers = {
-              'apikey': os.environ['SUPABASE_ANON_KEY'],
-              'Authorization': f"Bearer {os.environ['SUPABASE_ANON_KEY']}"
-          }
-
-          resp = requests.get(
-              f"{os.environ['SUPABASE_URL']}/rest/v1/tasks"
-              f"?scheduled_date=eq.{today}&status=eq.pending&is_extra=eq.false&select=text",
-              headers=headers
-          )
-          tasks = resp.json()
-
-          if tasks:
-              task_list = '\n'.join([f"• {t['text']}" for t in tasks])
-              message = (
-                  f"☀️ Good morning Manish! Here are your tasks for today:\n"
-                  f"{task_list}\n\n"
-                  f"Go get it 💪 → https://daily-dashboard-manish77.vercel.app"
-              )
-          else:
-              message = (
-                  "☀️ Good morning Manish! No tasks planned for today. "
-                  "Did you forget to fill in last night? → https://daily-dashboard-manish77.vercel.app"
-              )
-
-          requests.post(os.environ['DISCORD_WEBHOOK_URL'], json={'content': message})
-          EOF
-
   nightly-reminder:
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 16 * * *'
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 16 * * *'
     steps:
-      - name: Send nightly reminder
+      - name: Send nightly Discord reminder
         run: |
           curl -H "Content-Type: application/json" \
-          -d '{"content": "🌙 Hi Manish! Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
+          -d '{"content": "🌙 Hey Manish! Time for your nightly dashboard check-in. Go tick off your tasks and plan tomorrow: https://daily-dashboard-manish77.vercel.app"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  morning-reminder:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 1 * * *'
+    steps:
+      - name: Fetch todays tasks and send to Discord
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          RESPONSE=$(curl -s \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            "$SUPABASE_URL/rest/v1/tasks?scheduled_date=eq.$TODAY&status=eq.pending&is_extra=eq.false&select=text")
+          
+          TASKS=$(echo $RESPONSE | python3 -c "
+          import sys, json
+          tasks = json.load(sys.stdin)
+          if not tasks:
+              print('No tasks planned for today!')
+          else:
+              print('\n'.join(['• ' + t['text'] for t in tasks]))
+          ")
+          
+          MESSAGE="☀️ Good morning Manish! Here are your tasks for today:\n\n$TASKS\n\nGo get it 💪 → https://daily-dashboard-manish77.vercel.app"
+          
+          curl -H "Content-Type: application/json" \
+          -d "{\"content\": \"$MESSAGE\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}

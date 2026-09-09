@@ -1,20 +1,63 @@
-name: Daily Reminder
+name: Daily Reminders
 
 on:
   schedule:
-    - cron: "41 15 * * *"   # 15:41 UTC = 9:26 PM Kathmandu
-  workflow_dispatch: {}     # lets you manually trigger it to test
+    - cron: "15 1 * * *"   # 7:00 AM Kathmandu time (UTC+5:45)
+    - cron: "41 15 * * *"  # 15:41 UTC = 9:26 PM Kathmandu 
+  workflow_dispatch: {}     # lets you manually trigger to test
 
 jobs:
-  send-reminder:
+  morning-reminder:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 1 * * *'
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord reminder
+      - name: Send morning reminder with today's tasks
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          python3 - <<'EOF'
+          import requests, os
+          from datetime import datetime, timezone, timedelta
+
+          npt = timezone(timedelta(hours=5, minutes=45))
+          today = datetime.now(npt).strftime('%Y-%m-%d')
+
+          headers = {
+              'apikey': os.environ['SUPABASE_ANON_KEY'],
+              'Authorization': f"Bearer {os.environ['SUPABASE_ANON_KEY']}"
+          }
+
+          resp = requests.get(
+              f"{os.environ['SUPABASE_URL']}/rest/v1/tasks"
+              f"?scheduled_date=eq.{today}&status=eq.pending&is_extra=eq.false&select=text",
+              headers=headers
+          )
+          tasks = resp.json()
+
+          if tasks:
+              task_list = '\n'.join([f"• {t['text']}" for t in tasks])
+              message = (
+                  f"☀️ Good morning Manish! Here are your tasks for today:\n"
+                  f"{task_list}\n\n"
+                  f"Go get it 💪 → https://daily-dashboard-manish77.vercel.app"
+              )
+          else:
+              message = (
+                  "☀️ Good morning Manish! No tasks planned for today. "
+                  "Did you forget to fill in last night? → https://daily-dashboard-manish77.vercel.app"
+              )
+
+          requests.post(os.environ['DISCORD_WEBHOOK_URL'], json={'content': message})
+          EOF
+
+  nightly-reminder:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '15 16 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send nightly reminder
         run: |
           curl -H "Content-Type: application/json" \
-          -d '{"content": "Hi Manish, Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
-<<<<<<< HEAD
+          -d '{"content": "🌙 Hi Manish! Time for your nightly dashboard check-in! Go fill it in: https://daily-dashboard-manish77.vercel.app"}' \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
-=======
-          ${{ secrets.DISCORD_WEBHOOK_URL }}
->>>>>>> d18d3382ec1ed439fcbee295d7ce6d89fcaa3677

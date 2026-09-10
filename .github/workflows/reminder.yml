@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Fetch todays tasks and send to Discord
         env:
-          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           TODAY=$(date -u +%Y-%m-%d)
